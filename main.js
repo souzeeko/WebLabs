@@ -93,5 +93,4 @@ function initApp() {
   });
 }
 
-// Запуск приложения
 initApp();

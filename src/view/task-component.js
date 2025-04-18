@@ -1,24 +1,16 @@
-import { createElement } from '../framework/render.js';
+import AbstractComponent from '../framework/view/abstract-component.js';
 
-export default class TaskComponent {
+export default class TaskComponent extends AbstractComponent {
+  #task = null;
+
   constructor(task) {
-    this.task = task;
+    super();
+    this.#task = task;
   }
 
-  getTemplate() {
+  get template() {
     return `
-      <div class="task ${this.task.status}-state">${this.task.title}</div>
+      <div class="task ${this.#task.status}-state">${this.#task.title}</div>
     `;
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

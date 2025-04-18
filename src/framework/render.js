@@ -1,3 +1,5 @@
+import AbstractComponent from './view/abstract-component.js';
+
 const RenderPosition = {
     BEFOREBEGIN: 'beforebegin',
     AFTERBEGIN: 'afterbegin',
@@ -13,7 +15,13 @@ const RenderPosition = {
   }
   
   function render(component, container, place = RenderPosition.BEFOREEND) {
-  container.insertAdjacentElement(place, component.getElement());
+    if (component instanceof AbstractComponent) {
+      container.insertAdjacentElement(place, component.element);
+    } else if (container == null) {
+      throw new Error('Contsainer element doesn\'t exist');
+    } else {
+      throw new Error('Can render only components');
+    }
   }
   
 export {RenderPosition, createElement, render};  

@@ -1,28 +1,20 @@
-import { createElement } from '../framework/render.js';
+import AbstractComponent from '../framework/view/abstract-component.js';
 import { StatusToColumnMap } from '../const.js';
 
-export default class ColumnComponent {
+export default class ColumnComponent extends AbstractComponent {
+  #status = null;
+
   constructor(status) {
-    this.status = status;
+    super();
+    this.#status = status;
   }
 
-  getTemplate() {
+  get template() {
     return `
-      <div class="column ${this.status}">
-        <h2>${StatusToColumnMap[this.status]}</h2>
+      <div class="column ${this.#status}">
+        <h2>${StatusToColumnMap[this.#status]}</h2>
         <div class="tasks-container"></div>
       </div>
     `;
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

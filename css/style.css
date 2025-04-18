@@ -112,10 +112,10 @@ h2 {
     cursor: grab;
 }
 
-.backlog-state {border-left: 5px solid #bfbfbf;}
-.in-progress-state {border-left: 5px solid  #93c5fd}
-.done-state {border-left: 5px solid #bbf7d0}
-.trash-state {border-left: 5px solid #fecaca}
+.backlog-state {border-left: 5px solid #bfbfbf; border-top: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf; border-bottom: 1px solid #bfbfbf}
+.in-progress-state {border-left: 5px solid  #93c5fd; border-top: 1px solid #93c5fd; border-right: 1px solid #93c5fd; border-bottom: 1px solid #93c5fd}
+.done-state {border-left: 5px solid #bbf7d0; border-top: 1px solid #bbf7d0; border-right: 1px solid #bbf7d0; border-bottom: 1px solid #bbf7d0}
+.trash-state {border-left: 5px solid #fecaca; border-top: 1px solid #fecaca; border-right: 1px solid #fecaca; border-bottom: 1px solid #fecaca}
 
 .clear-btn {
     display: block;
@@ -140,7 +140,12 @@ h2 {
     gap: 5px;
   }
 
- 
-
-
-  
+.task-empty-state {
+    color: #bfbfbf;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #bfbfbf
+  }

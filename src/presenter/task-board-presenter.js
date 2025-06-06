@@ -15,6 +15,7 @@ export default class TasksBoardPresenter extends AbstractComponent {
     super();
     this.#container = container;
     this.#taskModel = taskModel;
+    this.#taskModel.addObserver(this.#handleModelChange.bind(this));
   }
 
   init() {
@@ -27,22 +28,34 @@ export default class TasksBoardPresenter extends AbstractComponent {
     });
   }
 
+  #clearBoard() {
+    this.#container.element.innerHTML = '';
+  }
+
   #renderColumn(status) {
     const column = new ColumnComponent(status);
     this.#columns[status] = column;
     render(column, this.#container.element);
 
     const tasksContainer = column.element.querySelector('.tasks-container');
+    // Получаем все задачи с текущим статусом
     const tasks = this.#taskModel.getTasksByStatus(status);
 
-    if (tasks.length === 0) {
+    if (tasks.length === 0 && status !== 'trash') {
       this.#renderEmptyState(tasksContainer);
     } else {
       this.#renderTasksList(tasksContainer, tasks);
     }
 
     if (status === 'trash') {
-      this.#renderClearButton(column.element);
+      const clearButton = new ClearButtonComponent(() => {
+        this.#taskModel.clearBin();
+      });
+      render(clearButton, column.element);
+
+      if (tasks.length === 0) {
+        clearButton.element.disabled = true;
+      }
     }
   }
 
@@ -56,7 +69,15 @@ export default class TasksBoardPresenter extends AbstractComponent {
     render(new EmptyTaskComponent(), container);
   }
 
-  #renderClearButton(container) {
-    render(new ClearButtonComponent(), container);
+  #handleModelChange() {
+    this.#clearBoard();
+    this.#renderBoard();
+  }
+
+  createTask() {
+    const taskTitle = document.querySelector('.task-input').value.trim();
+    if (!taskTitle) { return; }
+    this.#taskModel.addTask(taskTitle);
+    document.querySelector('.task-input').value = '';
   }
 }

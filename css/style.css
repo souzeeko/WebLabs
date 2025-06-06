@@ -133,6 +133,15 @@ h2 {
     border-color: #d9534f;
 }
 
+.clear-btn:disabled {
+    background-color: #bfbfbf;
+    color: #555;
+    cursor: default;
+    box-shadow: none;
+    border-color: #555;
+}
+
+
 .tasks-container {
     display: flex;
     flex-direction: column;

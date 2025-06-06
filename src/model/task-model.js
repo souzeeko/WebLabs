@@ -16,31 +16,60 @@ export default class TaskModel {
     this.#observers.push(observer);
   }
 
-  removeObserver(observer) {
-    this.#observers = this.#observers.filter((obs) => obs !== observer); 
-  }
-
   _notifyObservers() {
-    this.#observers.forEach(observer => observer());
+    for (const observer of this.#observers) {
+      observer();
+    }
   }
 
-  addTask(task) {
+  addTask(title) {
     const newTask = {
       id: generateID(),
-      title : task,
-      status: 'backlog',
-    }
+      title,
+      status: 'backlog'
+    };
     this.#tasks.push(newTask);
     this._notifyObservers();
     return newTask;
   }
 
   clearBin() {
-		this.#tasks = this.#tasks.filter(task => task.status !== 'trash')
-		this._notifyObservers();
-	}
+    this.#tasks = this.#tasks.filter(task => task.status !== 'trash');
+    this._notifyObservers();
+  }
 
   getTasksByStatus(status) {
     return this.#tasks.filter(task => task.status === status);
+  }
+
+  updateTaskStatus(id, newStatus, newPosition) {
+    const oldIndex = this.#tasks.findIndex(task => task.id === id);
+
+    if (oldIndex === -1) {
+      return;
+    }
+
+    const task = this.#tasks[oldIndex];
+    this.#tasks.splice(oldIndex, 1);
+    task.status = newStatus;
+    const tasksOfStatus = this.getTasksByStatus(newStatus);
+
+    if (newPosition >= tasksOfStatus.length) {
+      let lastIndex = -1;
+
+      for (let i = 0; i < this.#tasks.length; i++) {
+        if (this.#tasks[i].status === newStatus) {
+          lastIndex = i;
+        }
+      }
+      
+      this.#tasks.splice(lastIndex + 1, 0, task);
+    } else {
+      const refTask = tasksOfStatus[newPosition];
+      const refIndex = this.#tasks.findIndex(t => t.id === refTask.id);
+      this.#tasks.splice(refIndex, 0, task);
+    }
+
+    this._notifyObservers();
   }
 }

@@ -22,26 +22,53 @@ export default class TasksBoardPresenter extends AbstractComponent {
     this.#renderBoard();
   }
 
-  #renderBoard() {
-    Object.keys(StatusToColumnMap).forEach(status => {
-      this.#renderColumn(status);
-    });
-  }
-
   #clearBoard() {
     this.#container.element.innerHTML = '';
+    this.#columns = {};
+  }
+
+  #renderBoard() {
+    Object.keys(StatusToColumnMap).forEach((status) => {
+      this.#renderColumn(status);
+    });
   }
 
   #renderColumn(status) {
     const column = new ColumnComponent(status);
     this.#columns[status] = column;
     render(column, this.#container.element);
+    const columnElement = column.element;
+    const tasksContainer = columnElement.querySelector('.tasks-container');
 
-    const tasksContainer = column.element.querySelector('.tasks-container');
-    // Получаем все задачи с текущим статусом
+    columnElement.addEventListener('dragover', (evt) => {
+      evt.preventDefault();
+      evt.dataTransfer.dropEffect = 'move';
+    });
+
+    columnElement.addEventListener('drop', (evt) => {
+      evt.preventDefault();
+      const data = evt.dataTransfer.getData('text/plain');
+      const taskId = Number(data);
+      const newStatus = status;
+      const allTaskElems = Array.from(tasksContainer.querySelectorAll('.task'));
+      const taskElement = evt.target.closest('.task');
+      let newPosition;
+
+      if (taskElement && tasksContainer.contains(taskElement)) {
+        const bounding = taskElement.getBoundingClientRect();
+        const midY = bounding.top + bounding.height / 2;
+        const targetIndex = allTaskElems.indexOf(taskElement);
+        newPosition = (evt.clientY < midY) ? targetIndex : (targetIndex + 1);
+      } else {
+        newPosition = allTaskElems.length;
+      }
+
+      this.#taskModel.updateTaskStatus(taskId, newStatus, newPosition);
+    });
+
     const tasks = this.#taskModel.getTasksByStatus(status);
 
-    if (tasks.length === 0 && status !== 'trash') {
+    if (tasks.length === 0) {
       this.#renderEmptyState(tasksContainer);
     } else {
       this.#renderTasksList(tasksContainer, tasks);
@@ -51,7 +78,7 @@ export default class TasksBoardPresenter extends AbstractComponent {
       const clearButton = new ClearButtonComponent(() => {
         this.#taskModel.clearBin();
       });
-      render(clearButton, column.element);
+      render(clearButton, columnElement);
 
       if (tasks.length === 0) {
         clearButton.element.disabled = true;
@@ -60,7 +87,7 @@ export default class TasksBoardPresenter extends AbstractComponent {
   }
 
   #renderTasksList(container, tasks) {
-    tasks.forEach(task => {
+    tasks.forEach((task) => {
       render(new TaskComponent(task), container);
     });
   }
@@ -76,7 +103,9 @@ export default class TasksBoardPresenter extends AbstractComponent {
 
   createTask() {
     const taskTitle = document.querySelector('.task-input').value.trim();
+
     if (!taskTitle) { return; }
+
     this.#taskModel.addTask(taskTitle);
     document.querySelector('.task-input').value = '';
   }

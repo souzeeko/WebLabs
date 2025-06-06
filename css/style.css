@@ -110,6 +110,28 @@ h2 {
     border-radius: 5px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
     cursor: grab;
+    transition: opacity 0.2s ease;
+}
+
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 5px;
+}
+
+.task-empty-state {
+    color: #bfbfbf;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #bfbfbf
+}
+
+.task.dragging {
+  opacity: 0.5;
 }
 
 .backlog-state {border-left: 5px solid #bfbfbf; border-top: 1px solid #bfbfbf; border-right: 1px solid #bfbfbf; border-bottom: 1px solid #bfbfbf}
@@ -140,21 +162,3 @@ h2 {
     box-shadow: none;
     border-color: #555;
 }
-
-
-.tasks-container {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    gap: 5px;
-  }
-
-.task-empty-state {
-    color: #bfbfbf;
-    font-weight: bold;
-    padding: 10px;
-    text-align: center;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: 1px solid #bfbfbf
-  }

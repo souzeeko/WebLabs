@@ -1,9 +1,14 @@
 export const tasks = [
-    { id: 1, title: "Выучить JS", status: "backlog" },
-    { id: 2, title: "Выучить React", status: "backlog" },
-    { id: 3, title: "Сделать домашку", status: "backlog" },
-    { id: 6, title: "Позвонить маме", status: "done" },
-    { id: 7, title: "Погладить кота", status: "done" },
-    { id: 8, title: "Сходить погулять", status: "trash" },
-    { id: 9, title: "Прочитать Войну и Мир", status: "trash" }
-  ];
+  { "title": "Составить план проекта",    "status": "backlog",     "id": "1"  },
+  { "title": "Исследовать требования",    "status": "backlog",     "id": "2"  },
+  { "title": "Разработать прототип",      "status": "in-progress", "id": "3"  },
+  { "title": "Проверить прототип",        "status": "in-progress", "id": "4"  },
+  { "title": "Подготовить презентацию",   "status": "done",        "id": "5"  },
+  { "title": "Провести презентацию",      "status": "done",        "id": "6"  },
+  { "title": "Собрать обратную связь",    "status": "in-progress", "id": "7"  },
+  { "title": "Внедрить правки",           "status": "backlog",     "id": "8"  },
+  { "title": "Тестирование",              "status": "done",        "id": "9"  },
+  { "title": "Деплой на прод",            "status": "backlog",     "id": "10" },
+  { "title": "Удалить временные файлы",   "status": "trash",       "id": "11" },
+  { "title": "Очистить старые записи",    "status": "trash",       "id": "12" }
+];

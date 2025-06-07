@@ -19,7 +19,7 @@ export default class TaskComponent extends AbstractComponent {
   get element() {
     const element = super.element;
     element.addEventListener('dragstart', (evt) => {
-      evt.dataTransfer.setData('text/plain', String(this.#task.id));
+      evt.dataTransfer.setData('text/plain', this.#task.id);
       evt.dataTransfer.effectAllowed = 'move';
       element.classList.add('dragging');
     });

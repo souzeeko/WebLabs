@@ -1,75 +1,78 @@
-import { generateID } from "../utils.js";
+import Observable from '../framework/observable.js';
+import { generateID } from '../utils.js';
+import { UserAction, UpdateType } from '../const.js';
 
-export default class TaskModel {
+export default class TaskModel extends Observable {
+  #tasksApiService = null;
   #tasks = [];
-  #observers = [];
 
-  constructor(tasks) {
-    this.#tasks = tasks;
+  constructor({ tasksApiService }) {
+    super();
+    this.#tasksApiService = tasksApiService;
   }
 
   get tasks() {
     return this.#tasks;
   }
 
-  addObserver(observer) {
-    this.#observers.push(observer);
-  }
-
-  _notifyObservers() {
-    for (const observer of this.#observers) {
-      observer();
-    }
-  }
-
-  addTask(title) {
-    const newTask = {
-      id: generateID(),
-      title,
-      status: 'backlog'
-    };
-    this.#tasks.push(newTask);
-    this._notifyObservers();
-    return newTask;
-  }
-
-  clearBin() {
-    this.#tasks = this.#tasks.filter(task => task.status !== 'trash');
-    this._notifyObservers();
-  }
-
-  getTasksByStatus(status) {
-    return this.#tasks.filter(task => task.status === status);
-  }
-
-  updateTaskStatus(id, newStatus, newPosition) {
-    const oldIndex = this.#tasks.findIndex(task => task.id === id);
-
-    if (oldIndex === -1) {
-      return;
+  async init() {
+    try {
+      this.#tasks = await this.#tasksApiService.tasks;
+    } catch {
+      this.#tasks = [];
     }
 
-    const task = this.#tasks[oldIndex];
+    this._notify(UpdateType.INIT);
+  }
+
+  async addTask(title) {
+    const newTask = { id: generateID(), title, status: 'backlog' };
+    
+    const created = await this.#tasksApiService.addTask(newTask);
+    this.#tasks.push(created);
+    this._notify(UpdateType.MINOR, { action: UserAction.ADD_TASK, task: created });
+    return created;
+  }
+
+  async updateTaskStatus(id, newStatus, newPosition) {
+    const oldIndex = this.#tasks.findIndex(t => t.id === String(id));
+
+    if (oldIndex === -1) return;
+
+    const task = { ...this.#tasks[oldIndex], status: newStatus };
+
     this.#tasks.splice(oldIndex, 1);
-    task.status = newStatus;
-    const tasksOfStatus = this.getTasksByStatus(newStatus);
 
-    if (newPosition >= tasksOfStatus.length) {
-      let lastIndex = -1;
+    const same = this.#tasks.filter(t => t.status === newStatus);
 
-      for (let i = 0; i < this.#tasks.length; i++) {
-        if (this.#tasks[i].status === newStatus) {
-          lastIndex = i;
-        }
-      }
-      
+    if (newPosition >= same.length) {
+      const lastIndex = this.#tasks
+        .map((t,i) => t.status === newStatus ? i : -1)
+        .filter(i => i >= 0)
+        .pop() ?? -1;
       this.#tasks.splice(lastIndex + 1, 0, task);
     } else {
-      const refTask = tasksOfStatus[newPosition];
-      const refIndex = this.#tasks.findIndex(t => t.id === refTask.id);
-      this.#tasks.splice(refIndex, 0, task);
+      const ref = same[newPosition];
+
+      const refIdx = this.#tasks.findIndex(t => t.id === ref.id);
+      this.#tasks.splice(refIdx, 0, task);
     }
 
-    this._notifyObservers();
+    const updated = await this.#tasksApiService.updateTask(task);
+
+    const idx = this.#tasks.findIndex(t => t.id === updated.id);
+
+    if (idx !== -1) {
+      this.#tasks[idx] = updated;
+    }
+
+    this._notify(UpdateType.PATCH, { action: UserAction.UPDATE_TASK, task: updated });
+  }
+
+  async clearBin() {
+    const trash = this.#tasks.filter(t => t.status === 'trash');
+    await Promise.all(trash.map(t => this.#tasksApiService.deleteTask(t.id)));
+    this.#tasks = this.#tasks.filter(t => t.status !== 'trash');
+    this._notify(UpdateType.MINOR, { action: UserAction.DELETE_TASK });
   }
 }

@@ -10,7 +10,7 @@ const RenderPosition = {
   function createElement(template) {
     const newElement = document.createElement('div');
     newElement.innerHTML = template;
-  
+    
     return newElement.firstElementChild;
   }
   
@@ -25,3 +25,9 @@ const RenderPosition = {
   }
   
 export {RenderPosition, createElement, render};  
+
+export function remove(component) {
+  if (component?.element instanceof HTMLElement) {
+    component.element.remove();
+  }
+}

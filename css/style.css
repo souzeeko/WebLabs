@@ -162,3 +162,10 @@ h2 {
     box-shadow: none;
     border-color: #555;
 }
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+  margin: 20px 0;
+}
